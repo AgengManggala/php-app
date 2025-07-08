@@ -2,6 +2,12 @@ pipeline {
     agent any
 
     stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/AgengManggala/php-app.git'
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 sh '''
@@ -30,7 +36,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh 'docker build -t php-app .'
-                sh 'docker rm -f php-app-container || true'
                 sh 'docker run -d --name php-app-container -p 9000:80 php-app'
             }
         }
