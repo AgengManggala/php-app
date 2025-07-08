@@ -10,13 +10,20 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'composer install'
+                sh '''
+                    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+                    php composer-setup.php
+                    php -r "unlink('composer-setup.php');"
+                    php composer.phar install
+                '''
             }
         }
 
         stage('Unit Test') {
             steps {
-                sh './vendor/bin/phpunit tests'
+                sh 'php composer.phar install' // just in case
+                sh 'php composer.phar dump-autoload'
+                sh 'php composer.phar run-script test || ./vendor/bin/phpunit tests'
             }
             post {
                 success {
